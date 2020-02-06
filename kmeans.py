@@ -1,11 +1,9 @@
 import numpy as np
 import matplotlib.pyplot as plt
+from mpl_toolkits import mplot3d
 
-def run():
-    m = 100  # sample size
-    n = 2   # number of features
-    K = 3   # number of clusters
-    X = np.random.uniform(0, 100, (m,n))
+def run(X, K):
+    m, n = X.shape  # sample size, feature size
 
     # pick K initial centroids from positions of randomly selected samples
     indexes = np.random.randint(0, m, K)
@@ -21,9 +19,13 @@ def run():
         J_history.append(J)
         if len(J_history) > 1 and J >= J_history[-2]:   # keep going until cost stops decreasing
             converged = True
-        plotClusters(X, clusterings, centroids)
+        if n == 2:
+            plotClusters(X, clusterings, centroids)
+        elif n == 3:
+            plotClusters3D(X, clusterings, centroids)
 
-    plt.plot(np.arange(0,len(J_history)), J_history, label='J')
+    #plt.plot(np.arange(0,len(J_history)), J_history, label='J')
+    return clusterings
 
 def assignClusters(X, centroids):
     m = len(X)
@@ -63,4 +65,16 @@ def plotClusters(X, clusterings, centroids):
     plt.ylabel('x2')
     plt.show()
 
-run()
+def plotClusters3D(X, clusterings, centroids):
+    #fig = plt.figure()
+    ax = plt.axes(projection='3d')
+    K = len(centroids)
+    for k in range(K):
+        indexes = np.where(clusterings == k)[0]
+        cluster = X.take(indexes, axis = 0)
+        ax.scatter3D(cluster[:,0], cluster[:,1], cluster[:,2])
+        ax.plot3D([centroids[k][0]], [centroids[k][1]], [centroids[k][2]], '+')
+    ax.set_xlabel('x1')
+    ax.set_ylabel('x2')
+    ax.set_zlabel('x3')
+    plt.show()
