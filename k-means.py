@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 def run():
-    m = 50  # sample size
+    m = 100  # sample size
     n = 2   # number of features
     K = 3   # number of clusters
     X = np.random.uniform(0, 100, (m,n))
@@ -21,6 +21,7 @@ def run():
         J_history.append(J)
         if len(J_history) > 1 and J >= J_history[-2]:   # keep going until cost stops decreasing
             converged = True
+        plotClusters(X, clusterings, centroids)
 
     plt.plot(np.arange(0,len(J_history)), J_history, label='J')
 
@@ -51,8 +52,13 @@ def moveCentroids(centroids, X, clusterings):
     J = J / len(X)
     return newCentroids, J
 
-def plotCulsters(X, clusterings):
-    plt.scatter(X[:,0], X[:,1])
+def plotClusters(X, clusterings, centroids):
+    K = len(centroids)
+    for k in range(K):
+        indexes = np.where(clusterings == k)[0]
+        cluster = X.take(indexes, axis = 0)
+        plt.scatter(cluster[:,0], cluster[:,1])
+        plt.plot(centroids[k][0], centroids[k][1], '+')
     plt.xlabel('x1')
     plt.ylabel('x2')
     plt.show()
